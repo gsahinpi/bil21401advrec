@@ -28,6 +28,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.LinkedList;
 
 /**
@@ -37,7 +41,7 @@ import java.util.LinkedList;
  */
 public class MainActivity extends AppCompatActivity {
 
-    private final LinkedList<String> mWordList = new LinkedList<>();
+    private final LinkedList<VolumeInfo> mWordList = new LinkedList<>();
 
     private RecyclerView mRecyclerView;
     private WordListAdapter mAdapter;
@@ -55,7 +59,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 int wordListSize = mWordList.size();
                 // Add a new word to the wordList.
-                mWordList.addLast("+ Word " + wordListSize);
+
+               // mWordList.addLast("+ Word " + wordListSize);
                 // Notify the adapter, that the data has changed.
                 mRecyclerView.getAdapter().notifyItemInserted(wordListSize);
                 // Scroll to the bottom.
@@ -111,13 +116,13 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-     public class hakan extends AsyncTask<Void,Void,LinkedList<String> >
-     {   LinkedList<String> datalist ;
+     public class hakan extends AsyncTask<Void, Void, LinkedList<VolumeInfo>>
+     {   LinkedList<VolumeInfo> datalist ;
          Context con;
          RecyclerView mRecyclerViewrecycleisaret;
        WordListAdapter adapterisaret;
 
-         public hakan(Context c, LinkedList<String> datalist, RecyclerView mRecyclerViewrecycleisaret, WordListAdapter adapterisaret) {
+         public hakan(Context c, LinkedList<VolumeInfo> datalist, RecyclerView mRecyclerViewrecycleisaret, WordListAdapter adapterisaret) {
              con=c;
              this.datalist = datalist;;
              this.mRecyclerViewrecycleisaret = mRecyclerViewrecycleisaret;
@@ -125,17 +130,56 @@ public class MainActivity extends AppCompatActivity {
          }
 
          @Override
-         protected LinkedList<String> doInBackground(Void... voids) {
-           NetworkUtils.getBookInfo("shakespeare");
+         protected LinkedList<VolumeInfo> doInBackground(Void... voids) {
+         String jsoninput=  NetworkUtils.getBookInfo("shakespeare");
+          LinkedList<VolumeInfo> ins=processjsonstring(jsoninput);
 
 
 
-             for (int i = 0; i < 20; i++) {
-                 datalist.addLast("!Word " + i);
+             for (int i = 0; i < ins.size(); i++) {
+                 datalist.addLast(ins.get(i));
              }
              return datalist;
          }//doin backgrround
-         protected void onPostExecute(LinkedList<String> result) {
+
+         private LinkedList<VolumeInfo> processjsonstring(String jsoninput) {
+             JSONObject jsonObject = null;
+             LinkedList<VolumeInfo> output=new LinkedList<VolumeInfo>();
+             try {
+                 jsonObject = new JSONObject(jsoninput);
+                 JSONArray itemsArray = jsonObject.getJSONArray("items");
+                 for (int i=0; i<itemsArray.length();i++)
+                 {
+                     JSONObject book = itemsArray.getJSONObject(i);
+                     JSONObject volumeInfo = book.getJSONObject("volumeInfo");
+                     try {
+                        String  title = volumeInfo.getString("title");
+                         String authors = volumeInfo.getString("authors");
+                         String desc=volumeInfo.getString("description");
+                         String lang=volumeInfo.getString("language");
+                         VolumeInfo v=new VolumeInfo();
+                         v.setTitle(title);
+                         v.setAuthors(authors);
+                         v.setDescription(desc);
+                         v.setLanguage(lang);
+                         output.addLast(v);
+
+                     } catch (JSONException e) {
+                         e.printStackTrace();
+                     }
+
+                 }//for int
+
+
+             } catch (JSONException e) {
+                 e.printStackTrace();
+             }
+             // Get the JSONArray of book items.
+
+                  return output;
+         }//process
+
+         protected void onPostExecute(LinkedList<VolumeInfo> result) {
              mAdapter = new WordListAdapter(con, mWordList);
              // Connect the adapter with the recycler view.
              mRecyclerView.setAdapter(mAdapter);

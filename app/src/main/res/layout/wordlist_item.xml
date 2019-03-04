@@ -26,4 +26,9 @@
         android:id="@+id/word"
         style="@style/word_title" />
 
+    <TextView
+        android:id="@+id/word2"
+        style="@style/word_title"
+        android:background="@color/colorAccent" />
+
 </LinearLayout>

@@ -32,13 +32,14 @@ import java.util.LinkedList;
 public class WordListAdapter extends
         RecyclerView.Adapter<WordListAdapter.WordViewHolder> {
 
-    private final LinkedList<String> mWordList;
+    private final LinkedList<VolumeInfo> mWordList;
     private final LayoutInflater mInflater;
 
     class WordViewHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener {
         public final TextView wordItemView;
         final WordListAdapter mAdapter;
+        public TextView wordItemView2;
 
         /**
          * Creates a new custom view holder to hold the view to display in
@@ -51,6 +52,7 @@ public class WordListAdapter extends
         public WordViewHolder(View itemView, WordListAdapter adapter) {
             super(itemView);
             wordItemView = itemView.findViewById(R.id.word);
+            wordItemView2=itemView.findViewById(R.id.word2);
             this.mAdapter = adapter;
             itemView.setOnClickListener(this);
         }
@@ -61,17 +63,19 @@ public class WordListAdapter extends
             int mPosition = getLayoutPosition();
 
             // Use that to access the affected item in mWordList.
-            String element = mWordList.get(mPosition);
+            VolumeInfo v = mWordList.get(mPosition);
             // Change the word in the mWordList.
+            v.setTitle("clicked"+v.getTitle());
 
-            mWordList.set(mPosition, "Clicked! " + element);
+            mWordList.set(mPosition, v);
             // Notify the adapter, that the data has changed so it can
             // update the RecyclerView to display the data.
+
             mAdapter.notifyDataSetChanged();
         }
     }
 
-    public WordListAdapter(Context context, LinkedList<String> wordList) {
+    public WordListAdapter(Context context, LinkedList<VolumeInfo> wordList) {
         mInflater = LayoutInflater.from(context);
         this.mWordList = wordList;
     }
@@ -118,9 +122,10 @@ public class WordListAdapter extends
     public void onBindViewHolder(WordListAdapter.WordViewHolder holder,
                                  int position) {
         // Retrieve the data for that position.
-        String mCurrent = mWordList.get(position);
+        VolumeInfo  mCurrent = mWordList.get(position);
         // Add the data to the view holder.
-        holder.wordItemView.setText(mCurrent);
+        holder.wordItemView.setText(mCurrent.getTitle());
+        holder.wordItemView2.setText(mCurrent.getAuthors());
     }
 
     /**

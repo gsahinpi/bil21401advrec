@@ -1,6 +1,8 @@
 package com.example.recycleviewadvanced;
 
-public class VolumeInfo {
+import java.io.Serializable;
+
+public class VolumeInfo implements Serializable {
 
 
     private String title;

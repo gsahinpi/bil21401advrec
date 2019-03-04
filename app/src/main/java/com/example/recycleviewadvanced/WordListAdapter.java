@@ -17,6 +17,7 @@
 package com.example.recycleviewadvanced;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -65,6 +66,10 @@ public class WordListAdapter extends
             // Use that to access the affected item in mWordList.
             VolumeInfo v = mWordList.get(mPosition);
             // Change the word in the mWordList.
+            Intent intent = new Intent(view.getContext(), showdetails.class);
+            intent.putExtra("sentvalues", v);
+            view.getContext().startActivity(intent);
+
             v.setTitle("clicked"+v.getTitle());
 
             mWordList.set(mPosition, v);
